@@ -1,0 +1,80 @@
+======================================
+    QUICK START - البدء السريع
+======================================
+
+STEP 1: Test Database
+---------------------
+Open: /?page=databaseTest
+Wait for tests to complete
+✅ All green = Ready! Go to Step 3
+❌ Any red = Go to Step 2
+
+
+STEP 2: Fix Database (if needed)
+---------------------------------
+1. Open: /?page=databaseTest
+2. Click "Copy Script"
+3. Click "Open SQL Editor"
+4. Paste script
+5. Click "Run"
+6. Wait 10 seconds
+7. Go back and click "Test Again"
+8. Should be all green now ✅
+
+
+STEP 3: Create Account
+-----------------------
+Open: /?page=signup
+
+Email: student@kku.edu.sa
+Password: 12345678
+Name: Mohammad Ahmad
+Student ID: 443200001
+Phone: 0501234567
+Role: Student
+Major: MIS
+Level: 1
+GPA: 0.00
+
+Click "Create Account"
+Wait 3-5 seconds
+Done! ✅
+
+
+STEP 4: Login
+-------------
+Open: /?page=login
+
+Email: student@kku.edu.sa
+Password: 12345678
+
+Click "Login"
+You're in! 🎉
+
+
+======================================
+ERRORS? إذا واجهتك أخطاء؟
+======================================
+
+"PGRST116" or "email_exists"
+→ Open: /?page=autofix
+→ Click "Start Cleanup"
+
+"Database not setup"
+→ Go back to Step 2
+
+
+======================================
+IMPORTANT PAGES صفحات مهمة
+======================================
+
+Test System:    /?page=databaseTest
+Fix Errors:     /?page=autofix
+Signup:         /?page=signup
+Login:          /?page=login
+Home:           /?page=home
+
+
+======================================
+✨ SYSTEM READY! النظام جاهز! ✨
+======================================

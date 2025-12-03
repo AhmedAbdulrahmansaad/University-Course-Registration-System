@@ -1,0 +1,53 @@
+{
+  "name": "kku-course-registration-system",
+  "version": "1.0.0",
+  "description": "نظام تسجيل المقررات الإلكتروني - جامعة الملك خالد",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "@supabase/supabase-js": "^2.38.4",
+    "lucide-react": "^0.294.0",
+    "sonner": "^1.2.0",
+    "framer-motion": "^10.16.5"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.37",
+    "@types/react-dom": "^18.2.15",
+    "@typescript-eslint/eslint-plugin": "^6.10.0",
+    "@typescript-eslint/parser": "^6.10.0",
+    "@vitejs/plugin-react": "^4.2.0",
+    "eslint": "^8.53.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.4",
+    "typescript": "^5.2.2",
+    "vite": "^5.0.0"
+  },
+  "keywords": [
+    "جامعة الملك خالد",
+    "King Khalid University",
+    "Course Registration",
+    "تسجيل المقررات",
+    "React",
+    "TypeScript",
+    "Supabase",
+    "رؤية 2030",
+    "Saudi Vision 2030"
+  ],
+  "author": "King Khalid University - MIS Department",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YOUR_USERNAME/kku-course-registration-system.git"
+  },
+  "bugs": {
+    "url": "https://github.com/YOUR_USERNAME/kku-course-registration-system/issues"
+  },
+  "homepage": "https://github.com/YOUR_USERNAME/kku-course-registration-system#readme"
+}
