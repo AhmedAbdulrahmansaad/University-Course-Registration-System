@@ -36,6 +36,7 @@ interface DashboardStats {
   approvedRequests: number;
   totalSupervisors: number;
   totalAdmins: number;
+  unreadNotifications: number;
 }
 
 export const AdminDashboard: React.FC = () => {
@@ -47,6 +48,7 @@ export const AdminDashboard: React.FC = () => {
     approvedRequests: 0,
     totalSupervisors: 0,
     totalAdmins: 0,
+    unreadNotifications: 0,
   });
   const [loading, setLoading] = useState(true);
 
@@ -57,55 +59,45 @@ export const AdminDashboard: React.FC = () => {
   const fetchStats = async () => {
     try {
       console.log('📊 [AdminDashboard] Fetching stats...');
+      setLoading(true);
 
-      let newStats = {
-        totalStudents: 0,
+      // ✅ جلب البيانات مباشرة من Supabase
+      const [studentsResult, supervisorsResult, requestsResult, notificationsResult] = await Promise.all([
+        // عدد الطلاب
+        supabase.from('students').select('id', { count: 'exact', head: true }),
+        // عدد المشرفين
+        supabase.from('supervisors').select('id', { count: 'exact', head: true }),
+        // طلبات التسجيل
+        supabase.from('registrations').select('status', { count: 'exact' }),
+        // الإشعارات
+        supabase.from('notifications').select('is_read', { count: 'exact' })
+      ]);
+
+      const totalStudents = studentsResult.count || 0;
+      const totalSupervisors = supervisorsResult.count || 0;
+      
+      // حساب طلبات التسجيل
+      const allRequests = requestsResult.data || [];
+      const pendingRequests = allRequests.filter(r => r.status === 'pending').length;
+      const approvedRequests = allRequests.filter(r => r.status === 'approved').length;
+      
+      // حساب الإشعارات
+      const allNotifications = notificationsResult.data || [];
+      const unreadNotifications = allNotifications.filter(n => !n.is_read).length;
+
+      const newStats = {
+        totalStudents,
         totalCourses: 49,
-        pendingRequests: 0,
-        approvedRequests: 0,
-        totalSupervisors: 0,
-        totalAdmins: 0,
+        pendingRequests,
+        approvedRequests,
+        totalSupervisors,
+        totalAdmins: 1, // المدير الحالي
+        unreadNotifications,
       };
 
-      // ✅ Try backend first
-      try {
-        const result = await fetchJSON(
-          `https://${projectId}.supabase.co/functions/v1/make-server-1573e40a/admin/stats`,
-          {
-            headers: {
-              Authorization: `Bearer ${publicAnonKey}`,
-            },
-            timeout: 10000,
-          }
-        );
-
-        if (result.success && result.stats) {
-          newStats = result.stats;
-          console.log('✅ [AdminDashboard] Loaded stats from backend');
-        }
-      } catch (backendError) {
-        console.log('🔄 [AdminDashboard] Backend offline, using localStorage');
-      }
-
-      // ✅ Fallback to localStorage
-      if (newStats.totalStudents === 0) {
-        const localUsers = JSON.parse(localStorage.getItem('kku_users') || '[]');
-        const localRegs = JSON.parse(localStorage.getItem('kku_registrations') || '[]');
-        const localSupervisors = JSON.parse(localStorage.getItem('kku_supervisors') || '[]');
-
-        newStats = {
-          totalStudents: localUsers.filter((u: any) => u.role === 'student').length,
-          totalCourses: 49,
-          pendingRequests: localRegs.filter((r: any) => r.status === 'pending').length,
-          approvedRequests: localRegs.filter((r: any) => r.status === 'approved').length,
-          totalSupervisors: localSupervisors.length,
-          totalAdmins: localUsers.filter((u: any) => u.role === 'admin').length,
-        };
-
-        console.log('✅ [AdminDashboard] Loaded stats from localStorage:', newStats);
-      }
-
+      console.log('✅ [AdminDashboard] Stats loaded:', newStats);
       setStats(newStats);
+
     } catch (error) {
       console.error('❌ [AdminDashboard] Error fetching stats:', error);
       toast.error(

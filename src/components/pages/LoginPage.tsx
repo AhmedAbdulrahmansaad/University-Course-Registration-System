@@ -154,9 +154,22 @@ export const LoginPage: React.FC = () => {
 
       console.log('✅ [Login] User ID validation passed:', userInfo.id);
 
-      // حفظ البيانات
+      // ✅ مسح أي بيانات قديمة قبل حفظ الجديدة
+      console.log('🧹 [Login] Clearing old localStorage data...');
+      localStorage.removeItem('userInfo');
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('kku_user_session');
+      localStorage.removeItem('kku_access_token');
+
+      // ✅ حفظ البيانات الجديدة
+      console.log('💾 [Login] Saving new user data to localStorage...');
       localStorage.setItem('accessToken', authData.session.access_token);
       localStorage.setItem('userInfo', JSON.stringify(userInfo));
+      localStorage.setItem('isLoggedIn', 'true');
+      
+      console.log('✅ [Login] User data saved successfully');
       
       setUserInfo(userInfo);
       setIsLoggedIn(true);
