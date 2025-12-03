@@ -58,32 +58,39 @@ export const AdminDashboard: React.FC = () => {
 
   const fetchStats = async () => {
     try {
-      console.log('📊 [AdminDashboard] Fetching stats...');
+      console.log('📊 [AdminDashboard] بدء جلب الإحصائيات...');
       setLoading(true);
 
       // ✅ جلب البيانات مباشرة من Supabase
-      const [studentsResult, supervisorsResult, requestsResult, notificationsResult] = await Promise.all([
-        // عدد الطلاب
-        supabase.from('students').select('id', { count: 'exact', head: true }),
-        // عدد المشرفين
-        supabase.from('supervisors').select('id', { count: 'exact', head: true }),
-        // طلبات التسجيل
-        supabase.from('registrations').select('status', { count: 'exact' }),
-        // الإشعارات
-        supabase.from('notifications').select('is_read', { count: 'exact' })
+      const [studentsResult, supervisorsResult, requestsResult, notificationsResult, usersResult] = await Promise.all([
+        supabase.from('students').select('*', { count: 'exact' }),
+        supabase.from('supervisors').select('*', { count: 'exact' }),
+        supabase.from('registration_requests').select('*'),
+        supabase.from('notifications').select('*'),
+        supabase.from('users').select('*')
       ]);
 
-      const totalStudents = studentsResult.count || 0;
-      const totalSupervisors = supervisorsResult.count || 0;
+      console.log('📊 [AdminDashboard] النتائج من Supabase:');
+      console.log('  👥 الطلاب:', studentsResult);
+      console.log('  👨‍🏫 المشرفين:', supervisorsResult);
+      console.log('  📝 الطلبات:', requestsResult);
+      console.log('  🔔 الإشعارات:', notificationsResult);
+      console.log('  👤 المستخدمين:', usersResult);
+
+      // حساب الأعداد
+      const totalStudents = studentsResult.count || studentsResult.data?.length || 0;
+      const totalSupervisors = supervisorsResult.count || supervisorsResult.data?.length || 0;
       
-      // حساب طلبات التسجيل
       const allRequests = requestsResult.data || [];
-      const pendingRequests = allRequests.filter(r => r.status === 'pending').length;
-      const approvedRequests = allRequests.filter(r => r.status === 'approved').length;
+      const pendingRequests = allRequests.filter((r: any) => r.status === 'pending').length;
+      const approvedRequests = allRequests.filter((r: any) => r.status === 'approved').length;
       
-      // حساب الإشعارات
       const allNotifications = notificationsResult.data || [];
-      const unreadNotifications = allNotifications.filter(n => !n.is_read).length;
+      const unreadNotifications = allNotifications.filter((n: any) => !n.is_read).length;
+
+      // حساب المديرين من users
+      const allUsers = usersResult.data || [];
+      const totalAdmins = allUsers.filter((u: any) => u.role === 'admin').length;
 
       const newStats = {
         totalStudents,
@@ -91,15 +98,15 @@ export const AdminDashboard: React.FC = () => {
         pendingRequests,
         approvedRequests,
         totalSupervisors,
-        totalAdmins: 1, // المدير الحالي
+        totalAdmins,
         unreadNotifications,
       };
 
-      console.log('✅ [AdminDashboard] Stats loaded:', newStats);
+      console.log('✅ [AdminDashboard] الإحصائيات النهائية:', newStats);
       setStats(newStats);
 
     } catch (error) {
-      console.error('❌ [AdminDashboard] Error fetching stats:', error);
+      console.error('❌ [AdminDashboard] خطأ في جلب الإحصائيات:', error);
       toast.error(
         language === 'ar' ? 'فشل في تحميل الإحصائيات' : 'Failed to load statistics'
       );

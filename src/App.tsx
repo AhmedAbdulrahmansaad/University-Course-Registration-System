@@ -1,15 +1,11 @@
 import React from 'react';
 import { AppProvider, useApp } from './contexts/AppContext';
 import { Header } from './components/Header';
-import { Navigation } from './components/Navigation';
 import { Footer } from './components/Footer';
 import { AIAssistant } from './components/AIAssistant';
 import { RouteGuard } from './components/RouteGuard';
 import { HomePage } from './components/pages/HomePage';
 import { AboutPage } from './components/pages/AboutPage';
-import { ProjectPage } from './components/pages/ProjectPage';
-import { ProjectPhasesPage } from './components/pages/ProjectPhasesPage';
-import { DesignMethodologyPage } from './components/pages/DesignMethodologyPage';
 import { NewsPage } from './components/pages/NewsPage';
 import { ContactPage } from './components/pages/ContactPage';
 import { PrivacyPage } from './components/pages/PrivacyPage';
@@ -20,7 +16,6 @@ import { ReportsPage } from './components/pages/ReportsPage';
 import { DocumentsPage } from './components/pages/DocumentsPage';
 import { LoginPage } from './components/pages/LoginPage';
 import { SignUpPage } from './components/pages/SignUpPage';
-import { TestingPage } from './components/pages/TestingPage';
 import { RequestsPage } from './components/pages/RequestsPage';
 import { StudentDashboard } from './components/pages/StudentDashboard';
 import { CurriculumPage } from './components/pages/CurriculumPage';
@@ -36,11 +31,6 @@ import { MessagesPage } from './components/pages/MessagesPage';
 import { AnnouncementsPage } from './components/pages/AnnouncementsPage';
 import { AccessAgreementPage } from './components/pages/AccessAgreementPage';
 import { TranscriptPage } from './components/pages/TranscriptPage';
-import { SystemSetupPage } from './components/pages/SystemSetupPage';
-import { CleanupPage } from './components/pages/CleanupPage';
-import { DatabaseCheckPage } from './components/pages/DatabaseCheckPage';
-import { AutoFixPage } from './components/pages/AutoFixPage';
-import { SupabaseTestPage } from './components/pages/SupabaseTestPage';
 import { Toaster } from './components/ui/sonner';
 import { ArrowLeft, ArrowRight, Home } from 'lucide-react';
 import { Button } from './components/ui/button';
@@ -53,32 +43,13 @@ const AppContent: React.FC = () => {
     // صفحة التعهد (أول صفحة - إزامية)
     accessAgreement: { component: <AccessAgreementPage />, public: true },
     
-    // صفحة إعداد النظام (عامة - للتهيئة الأولية)
-    systemSetup: { component: <SystemSetupPage />, public: true },
-    
-    // صفحة تنظيف المستخدمين اليتامى (عامة)
-    cleanup: { component: <CleanupPage />, public: true },
-    
-    // صفحة فحص قاعدة البيانات (عامة)
-    databaseCheck: { component: <DatabaseCheckPage />, public: true },
-    
-    // صفحة الإصلاح التلقائي (عامة)
-    autofix: { component: <AutoFixPage />, public: true },
-    
-    // صفحة اختبار Supabase (عامة)
-    supabaseTest: { component: <SupabaseTestPage />, public: true },
-    
     // صفحات عامة (لا تحتاج تسجيل دخول)
     home: { component: <HomePage />, public: true },
     about: { component: <AboutPage />, public: true },
-    project: { component: <ProjectPage />, public: true },
-    projectPhases: { component: <ProjectPhasesPage />, public: true },
-    designMethodology: { component: <DesignMethodologyPage />, public: true },
     news: { component: <NewsPage />, public: true },
     contact: { component: <ContactPage />, public: true },
     privacy: { component: <PrivacyPage />, public: true },
     search: { component: <SearchPage />, public: true },
-    testing: { component: <TestingPage />, public: true },
     login: { component: <LoginPage />, public: true },
     signup: { component: <SignUpPage />, public: true },
 

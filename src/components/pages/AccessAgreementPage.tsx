@@ -1,30 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../../contexts/AppContext';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { Label } from '../ui/label';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../ui/card';
 import { Checkbox } from '../ui/checkbox';
-import { 
-  Shield, 
-  CheckCircle2, 
-  User, 
-  AlertCircle,
-  Globe,
-  Moon,
-  Sun,
-  ArrowRight,
-  Lock,
-  FileCheck,
-  GraduationCap,
-  Building2,
-  Award,
-  ScrollText,
-  AlertTriangle
-} from 'lucide-react';
-import { toast } from 'sonner@2.0.3';
-import { KKULogoSVG } from '../KKULogoSVG';
+import { Label } from '../ui/label';
+import { Input } from '../ui/input';
 import { ImageWithFallback } from '../figma/ImageWithFallback';
+import { 
+  CheckCircle2, 
+  AlertCircle, 
+  FileText, 
+  Shield, 
+  Eye, 
+  Lock,
+  Users,
+  Database,
+  Globe,
+  BookOpen,
+  GraduationCap,
+  Award,
+  Sparkles,
+  Sun,
+  Moon,
+  FileCheck,
+  User,
+  Building2,
+  ArrowRight
+} from 'lucide-react';
+import { KKULogo } from '../KKULogo';
+import { toast } from 'sonner@2.0.3';
 
 export const AccessAgreementPage: React.FC = () => {
   const { language, setLanguage, theme, setTheme, setCurrentPage, setHasAcceptedAgreement } = useApp();
@@ -69,17 +73,17 @@ export const AccessAgreementPage: React.FC = () => {
       text: 'عدم مشاركة بيانات الدخول الخاصة بي (البريد الإلكتروني وكلمة المرور) مع أي شخص آخر.'
     },
     {
-      icon: <User className="w-5 h-5 text-[#D4AF37] flex-shrink-0" />,
+      icon: <Users className="w-5 h-5 text-[#D4AF37] flex-shrink-0" />,
       title: 'الخصوصية',
       text: 'المحافظة على سرية المعلومات الشخصية والأكاديمية الخاصة بي وبزملائي الطلاب.'
     },
     {
-      icon: <ScrollText className="w-5 h-5 text-[#D4AF37] flex-shrink-0" />,
+      icon: <Database className="w-5 h-5 text-[#D4AF37] flex-shrink-0" />,
       title: 'الالتزام باللوائح',
       text: 'الالتزام بالأنظمة واللوائح الأكاديمية المعمول بها في جامعة الملك خالد.'
     },
     {
-      icon: <AlertTriangle className="w-5 h-5 text-[#D4AF37] flex-shrink-0" />,
+      icon: <AlertCircle className="w-5 h-5 text-[#D4AF37] flex-shrink-0" />,
       title: 'عدم الوصول غير المصرح',
       text: 'عدم محاولة الوصول غير المصرح به إلى أي بيانات أو معلومات لا تخصني.'
     },
@@ -107,17 +111,17 @@ export const AccessAgreementPage: React.FC = () => {
       text: 'Not to share my login credentials (email and password) with anyone else.'
     },
     {
-      icon: <User className="w-5 h-5 text-[#D4AF37] flex-shrink-0" />,
+      icon: <Users className="w-5 h-5 text-[#D4AF37] flex-shrink-0" />,
       title: 'Privacy',
       text: 'To maintain the confidentiality of personal and academic information of myself and fellow students.'
     },
     {
-      icon: <ScrollText className="w-5 h-5 text-[#D4AF37] flex-shrink-0" />,
+      icon: <Database className="w-5 h-5 text-[#D4AF37] flex-shrink-0" />,
       title: 'Compliance',
       text: 'To comply with all academic regulations and policies in effect at King Khalid University.'
     },
     {
-      icon: <AlertTriangle className="w-5 h-5 text-[#D4AF37] flex-shrink-0" />,
+      icon: <AlertCircle className="w-5 h-5 text-[#D4AF37] flex-shrink-0" />,
       title: 'No Unauthorized Access',
       text: 'Not to attempt unauthorized access to any data or information that does not belong to me.'
     },
@@ -280,7 +284,7 @@ export const AccessAgreementPage: React.FC = () => {
             {/* شعار جامعة الملك خالد */}
             <div className="flex justify-center mb-6">
               <div className="w-32 h-32 md:w-40 md:h-40 bg-white rounded-full p-4 shadow-2xl">
-                <KKULogoSVG className="w-full h-full" />
+                <KKULogo className="w-full h-full" />
               </div>
             </div>
 
