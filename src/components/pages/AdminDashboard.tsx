@@ -36,7 +36,6 @@ interface DashboardStats {
   approvedRequests: number;
   totalSupervisors: number;
   totalAdmins: number;
-  unreadNotifications: number;
 }
 
 export const AdminDashboard: React.FC = () => {
@@ -48,7 +47,6 @@ export const AdminDashboard: React.FC = () => {
     approvedRequests: 0,
     totalSupervisors: 0,
     totalAdmins: 0,
-    unreadNotifications: 0,
   });
   const [loading, setLoading] = useState(true);
 
@@ -58,55 +56,58 @@ export const AdminDashboard: React.FC = () => {
 
   const fetchStats = async () => {
     try {
-      console.log('📊 [AdminDashboard] بدء جلب الإحصائيات...');
-      setLoading(true);
+      console.log('📊 [AdminDashboard] Fetching stats...');
 
-      // ✅ جلب البيانات مباشرة من Supabase
-      const [studentsResult, supervisorsResult, requestsResult, notificationsResult, usersResult] = await Promise.all([
-        supabase.from('students').select('*', { count: 'exact' }),
-        supabase.from('supervisors').select('*', { count: 'exact' }),
-        supabase.from('registration_requests').select('*'),
-        supabase.from('notifications').select('*'),
-        supabase.from('users').select('*')
-      ]);
-
-      console.log('📊 [AdminDashboard] النتائج من Supabase:');
-      console.log('  👥 الطلاب:', studentsResult);
-      console.log('  👨‍🏫 المشرفين:', supervisorsResult);
-      console.log('  📝 الطلبات:', requestsResult);
-      console.log('  🔔 الإشعارات:', notificationsResult);
-      console.log('  👤 المستخدمين:', usersResult);
-
-      // حساب الأعداد
-      const totalStudents = studentsResult.count || studentsResult.data?.length || 0;
-      const totalSupervisors = supervisorsResult.count || supervisorsResult.data?.length || 0;
-      
-      const allRequests = requestsResult.data || [];
-      const pendingRequests = allRequests.filter((r: any) => r.status === 'pending').length;
-      const approvedRequests = allRequests.filter((r: any) => r.status === 'approved').length;
-      
-      const allNotifications = notificationsResult.data || [];
-      const unreadNotifications = allNotifications.filter((n: any) => !n.is_read).length;
-
-      // حساب المديرين من users
-      const allUsers = usersResult.data || [];
-      const totalAdmins = allUsers.filter((u: any) => u.role === 'admin').length;
-
-      const newStats = {
-        totalStudents,
+      let newStats = {
+        totalStudents: 0,
         totalCourses: 49,
-        pendingRequests,
-        approvedRequests,
-        totalSupervisors,
-        totalAdmins,
-        unreadNotifications,
+        pendingRequests: 0,
+        approvedRequests: 0,
+        totalSupervisors: 0,
+        totalAdmins: 0,
       };
 
-      console.log('✅ [AdminDashboard] الإحصائيات النهائية:', newStats);
-      setStats(newStats);
+      // ✅ Try backend first
+      try {
+        const result = await fetchJSON(
+          `https://${projectId}.supabase.co/functions/v1/make-server-1573e40a/admin/stats`,
+          {
+            headers: {
+              Authorization: `Bearer ${publicAnonKey}`,
+            },
+            timeout: 10000,
+          }
+        );
 
+        if (result.success && result.stats) {
+          newStats = result.stats;
+          console.log('✅ [AdminDashboard] Loaded stats from backend');
+        }
+      } catch (backendError) {
+        console.log('🔄 [AdminDashboard] Backend offline, using localStorage');
+      }
+
+      // ✅ Fallback to localStorage
+      if (newStats.totalStudents === 0) {
+        const localUsers = JSON.parse(localStorage.getItem('kku_users') || '[]');
+        const localRegs = JSON.parse(localStorage.getItem('kku_registrations') || '[]');
+        const localSupervisors = JSON.parse(localStorage.getItem('kku_supervisors') || '[]');
+
+        newStats = {
+          totalStudents: localUsers.filter((u: any) => u.role === 'student').length,
+          totalCourses: 49,
+          pendingRequests: localRegs.filter((r: any) => r.status === 'pending').length,
+          approvedRequests: localRegs.filter((r: any) => r.status === 'approved').length,
+          totalSupervisors: localSupervisors.length,
+          totalAdmins: localUsers.filter((u: any) => u.role === 'admin').length,
+        };
+
+        console.log('✅ [AdminDashboard] Loaded stats from localStorage:', newStats);
+      }
+
+      setStats(newStats);
     } catch (error) {
-      console.error('❌ [AdminDashboard] خطأ في جلب الإحصائيات:', error);
+      console.error('❌ [AdminDashboard] Error fetching stats:', error);
       toast.error(
         language === 'ar' ? 'فشل في تحميل الإحصائيات' : 'Failed to load statistics'
       );

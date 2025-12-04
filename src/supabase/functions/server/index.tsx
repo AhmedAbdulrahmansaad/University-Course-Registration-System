@@ -830,7 +830,7 @@ app.get('/make-server-1573e40a/dashboard/student/:userId', async (c) => {
 
     // جلب تسجيلات الطالب
     const { data: registrations, error: regError } = await supabase
-      .from('registration_requests')
+      .from('registrations')
       .select(`
         *,
         course:courses(*)
@@ -895,204 +895,6 @@ app.get('/make-server-1573e40a/dashboard/student/:userId', async (c) => {
   }
 });
 
-// 📚 GET: جلب تسجيلات الطالب المسجل دخوله (من access_token)
-app.get('/make-server-1573e40a/student/registrations', async (c) => {
-  try {
-    const accessToken = c.req.header('Authorization')?.replace('Bearer ', '');
-    
-    console.log('📚 [Student Registrations] Fetching registrations...');
-
-    // التحقق من وجود token
-    if (!accessToken) {
-      console.warn('⚠️ [Student Registrations] No access token provided');
-      return c.json({ success: false, error: 'Unauthorized' }, 401);
-    }
-
-    // الحصول على معلومات المستخدم من token
-    const { data: { user: authUser }, error: authError } = await supabase.auth.getUser(accessToken);
-
-    if (authError || !authUser) {
-      console.error('❌ [Student Registrations] Auth error:', authError);
-      return c.json({ success: false, error: 'Unauthorized' }, 401);
-    }
-
-    console.log('✅ [Student Registrations] Authenticated user:', authUser.email);
-
-    // جلب معلومات المستخدم من جدول users
-    const { data: user } = await supabase
-      .from('users')
-      .select('id, email, role')
-      .eq('auth_id', authUser.id)
-      .single();
-
-    if (!user) {
-      console.error('❌ [Student Registrations] User not found in database');
-      return c.json({ success: false, error: 'User not found' }, 404);
-    }
-
-    console.log('✅ [Student Registrations] User ID:', user.id);
-
-    // جلب التسجيلات من registration_requests
-    const { data: registrations, error: regError } = await supabase
-      .from('registration_requests')
-      .select(`
-        *,
-        course:courses(*)
-      `)
-      .eq('student_id', user.id)
-      .order('created_at', { ascending: false });
-
-    if (regError) {
-      console.error('❌ [Student Registrations] Error fetching registrations:', regError);
-      return c.json({ 
-        success: false, 
-        error: 'Failed to fetch registrations' 
-      }, 500);
-    }
-
-    console.log(`✅ [Student Registrations] Found ${registrations?.length || 0} registrations`);
-
-    return c.json({
-      success: true,
-      registrations: registrations || [],
-    });
-
-  } catch (error: any) {
-    console.error('❌ [Student Registrations] Error:', error);
-    return c.json({ 
-      success: false, 
-      error: error?.message || 'Failed to fetch registrations' 
-    }, 500);
-  }
-});
-
-// 🔔 GET: جلب إشعارات الطالب المسجل دخوله (من access_token)
-app.get('/make-server-1573e40a/student/notifications', async (c) => {
-  try {
-    const accessToken = c.req.header('Authorization')?.replace('Bearer ', '');
-    
-    console.log('🔔 [Student Notifications] Fetching notifications...');
-
-    // التحقق من وجود token
-    if (!accessToken) {
-      console.warn('⚠️ [Student Notifications] No access token provided');
-      return c.json({ success: false, error: 'Unauthorized' }, 401);
-    }
-
-    // الحصول على معلومات المستخدم من token
-    const { data: { user: authUser }, error: authError } = await supabase.auth.getUser(accessToken);
-
-    if (authError || !authUser) {
-      console.error('❌ [Student Notifications] Auth error:', authError);
-      return c.json({ success: false, error: 'Unauthorized' }, 401);
-    }
-
-    console.log('✅ [Student Notifications] Authenticated user:', authUser.email);
-
-    // جلب معلومات المستخدم من جدول users
-    const { data: user } = await supabase
-      .from('users')
-      .select('id, email, role')
-      .eq('auth_id', authUser.id)
-      .single();
-
-    if (!user) {
-      console.error('❌ [Student Notifications] User not found in database');
-      return c.json({ success: false, error: 'User not found' }, 404);
-    }
-
-    console.log('✅ [Student Notifications] User ID:', user.id);
-
-    // جلب الإشعارات
-    const { data: notifications, error: notifError } = await supabase
-      .from('notifications')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-      .limit(50);
-
-    if (notifError) {
-      console.error('❌ [Student Notifications] Error fetching notifications:', notifError);
-      return c.json({ 
-        success: false, 
-        error: 'Failed to fetch notifications' 
-      }, 500);
-    }
-
-    console.log(`✅ [Student Notifications] Found ${notifications?.length || 0} notifications`);
-
-    return c.json({
-      success: true,
-      notifications: notifications || [],
-    });
-
-  } catch (error: any) {
-    console.error('❌ [Student Notifications] Error:', error);
-    return c.json({ 
-      success: false, 
-      error: error?.message || 'Failed to fetch notifications' 
-    }, 500);
-  }
-});
-
-// 🔔 POST: تحديث جميع الإشعارات كمقروءة
-app.post('/make-server-1573e40a/student/notifications/read-all', async (c) => {
-  try {
-    const accessToken = c.req.header('Authorization')?.replace('Bearer ', '');
-    
-    console.log('🔔 [Mark All Read] Marking all notifications as read...');
-
-    if (!accessToken) {
-      return c.json({ success: false, error: 'Unauthorized' }, 401);
-    }
-
-    const { data: { user: authUser }, error: authError } = await supabase.auth.getUser(accessToken);
-
-    if (authError || !authUser) {
-      return c.json({ success: false, error: 'Unauthorized' }, 401);
-    }
-
-    const { data: user } = await supabase
-      .from('users')
-      .select('id')
-      .eq('auth_id', authUser.id)
-      .single();
-
-    if (!user) {
-      return c.json({ success: false, error: 'User not found' }, 404);
-    }
-
-    // تحديث جميع الإشعارات
-    const { error: updateError } = await supabase
-      .from('notifications')
-      .update({ is_read: true })
-      .eq('user_id', user.id)
-      .eq('is_read', false);
-
-    if (updateError) {
-      console.error('❌ [Mark All Read] Error:', updateError);
-      return c.json({ 
-        success: false, 
-        error: 'Failed to mark notifications as read' 
-      }, 500);
-    }
-
-    console.log('✅ [Mark All Read] All notifications marked as read');
-
-    return c.json({
-      success: true,
-      message: 'All notifications marked as read',
-    });
-
-  } catch (error: any) {
-    console.error('❌ [Mark All Read] Error:', error);
-    return c.json({ 
-      success: false, 
-      error: error?.message || 'Failed to mark notifications as read' 
-    }, 500);
-  }
-});
-
 // 📚 GET: جلب جميع المقررات المتاحة
 app.get('/make-server-1573e40a/courses', async (c) => {
   try {
@@ -1136,7 +938,7 @@ app.get('/make-server-1573e40a/registrations/:userId', async (c) => {
     console.log('📝 [Registrations] Fetching registrations for user:', userId);
 
     const { data: registrations, error: regError } = await supabase
-      .from('registration_requests')
+      .from('registrations')
       .select(`
         *,
         course:courses(*)
@@ -1184,7 +986,7 @@ app.post('/make-server-1573e40a/registrations', async (c) => {
 
     // التحقق من عدم التسجيل المكرر
     const { data: existing } = await supabase
-      .from('registration_requests')
+      .from('registrations')
       .select('id')
       .eq('student_id', student_id)
       .eq('course_id', course_id)
@@ -1201,7 +1003,7 @@ app.post('/make-server-1573e40a/registrations', async (c) => {
 
     // إنشاء التسجيل
     const { data: registration, error: regError } = await supabase
-      .from('registration_requests')
+      .from('registrations')
       .insert({
         student_id,
         course_id,
@@ -1317,19 +1119,19 @@ app.get('/make-server-1573e40a/admin/stats', async (c) => {
 
     // 5. طلبات التسجيل المعلقة
     const { count: pendingRequests } = await supabase
-      .from('registration_requests')
+      .from('registrations')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'pending');
 
     // 6. طلبات التسجيل المعتمدة
     const { count: approvedRequests } = await supabase
-      .from('registration_requests')
+      .from('registrations')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'approved');
 
     // 7. إجمالي التسجيلات
     const { count: totalRegistrations } = await supabase
-      .from('registration_requests')
+      .from('registrations')
       .select('*', { count: 'exact', head: true });
 
     // 8. الإشعارات غير المقروءة
@@ -1508,7 +1310,7 @@ app.delete('/make-server-1573e40a/admin/users/:userId', async (c) => {
     }
 
     // حذف التسجيلات
-    await supabase.from('registration_requests').delete().eq('student_id', userId);
+    await supabase.from('registrations').delete().eq('student_id', userId);
     console.log('✅ [Admin Delete User] Deleted registrations');
 
     // حذف الإشعارات
@@ -1677,10 +1479,10 @@ app.get('/make-server-1573e40a/notifications/supervisor/:userId', async (c) => {
 
     // جلب طلبات التسجيل المعلقة
     const { data: pendingRequests, error: reqError } = await supabase
-      .from('registration_requests')
+      .from('registrations')
       .select(`
         *,
-        student:users!registration_requests_student_id_fkey(id, name, email, student_id),
+        student:users!registrations_student_id_fkey(id, name, email, student_id),
         course:courses(*)
       `)
       .eq('status', 'pending')
@@ -1798,19 +1600,19 @@ app.get('/make-server-1573e40a/supervisor/stats/:userId', async (c) => {
 
     // طلبات التسجيل المعلقة
     const { count: pendingRequests } = await supabase
-      .from('registration_requests')
+      .from('registrations')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'pending');
 
     // إجمالي الطلبات المعتمدة
     const { count: approvedRequests } = await supabase
-      .from('registration_requests')
+      .from('registrations')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'approved');
 
     // إجمالي الطلبات المرفوضة
     const { count: rejectedRequests } = await supabase
-      .from('registration_requests')
+      .from('registrations')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'rejected');
 
@@ -1849,10 +1651,10 @@ app.get('/make-server-1573e40a/supervisor/requests', async (c) => {
     console.log('📝 [Supervisor Requests] Fetching all registration requests...');
 
     const { data: requests, error } = await supabase
-      .from('registration_requests')
+      .from('registrations')
       .select(`
         *,
-        student:users!registration_requests_student_id_fkey(id, name, email, student_id),
+        student:users!registrations_student_id_fkey(id, name, email, student_id),
         course:courses(*)
       `)
       .order('created_at', { ascending: false });
@@ -1899,7 +1701,7 @@ app.put('/make-server-1573e40a/supervisor/requests/:requestId', async (c) => {
 
     // تحديث الطلب
     const { data: request, error: updateError } = await supabase
-      .from('registration_requests')
+      .from('registrations')
       .update({
         status,
         notes: notes || null,

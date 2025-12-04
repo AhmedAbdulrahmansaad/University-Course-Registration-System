@@ -19,26 +19,13 @@ export const Header: React.FC = () => {
     setCurrentPage
   } = useApp();
 
-  const handleLogout = async () => {
-    // ✅ Clear Supabase session first
-    try {
-      const { supabase } = await import('../utils/supabase/client');
-      await supabase.auth.signOut();
-      console.log('✅ [Logout] Supabase session cleared');
-    } catch (error) {
-      console.error('❌ [Logout] Error signing out from Supabase:', error);
-    }
-
-    // ✅ Clear all localStorage items
+  const handleLogout = () => {
+    // Clear all user data
     localStorage.removeItem('userInfo');
     localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('accessToken');
     localStorage.removeItem('access_token');
     localStorage.removeItem('agreementAccepted');
-    localStorage.removeItem('kku_user_session');
-    localStorage.removeItem('kku_access_token');
     
-    // ✅ Clear state
     setIsLoggedIn(false);
     setUserInfo(null);
     
